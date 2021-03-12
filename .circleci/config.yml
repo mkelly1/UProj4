@@ -40,19 +40,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: frontend-build-{{ .BuildNum }}
-      - run:
-          name: Install front-end
-          command: npm install
-      - run:
-          name: Lint front-end
-          command: npm run lint
+          keys: [frontend-build]
       - run:
           name: Build front-end
-          command: npm run build
+          command: |
+            cd frontend
+            npm install
+            npm run lint
+            npm run build
       - save_cache:
-          paths: frontend/node_modules
-          key: frontend-build-{{ .BuildNum }}
+          paths: [frontend/node_modules]
+          key: frontend-build
 
   build-backend:
     docker:
@@ -61,19 +59,17 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: backend-build-{{ .BuildNum }}
+          keys: [backend-build]
       - run:
-          name: Install back-end
-          command: npm install
-      - run:
-          name: Lint back-end
-          command: npm run lint
-      - run:
-          name: Build back-end
-          command: npm run build
+          name: Back-end build
+          command: |
+            cd backend
+            npm install
+            npm run lint
+            npm run build
       - save_cache:
-          paths: backend/node_modules
-          key: backend-build-{{ .BuildNum }}
+          paths: [backend/node_modules]
+          key: backend-build
 
   test-frontend:
     docker:
@@ -81,7 +77,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: frontend-build-{{ .BuildNum }}
+          keys: [frontend-build]
       - run:
           name: Front-end test
           command: |
@@ -93,7 +89,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: backend-build-{{ .BuildNum }}
+          keys: [backend-build]
       - run:
           name: Back-end test
           command: |
@@ -105,7 +101,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: frontend-build-{{ .BuildNum }}
+          keys: [frontend-build]
       - run:
           name: Front-end scan
           command: |
@@ -116,7 +112,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: backend-build-{{ .BuildNum }}
+          keys: [backend-build]
       - run:
           name: Back-end scan
           command: |
