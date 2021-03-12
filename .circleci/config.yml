@@ -36,14 +36,20 @@ jobs:
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
           keys: [frontend-build]
       - run:
+          name: Install front-end
+          command: npm install
+      - run:
+          name: Lint front-end
+          command: npm run lint
+      - run:
           name: Build front-end
-          command: |
-            npm run build
+          command: npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -51,14 +57,20 @@ jobs:
   build-backend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/backend
     steps:
       - checkout
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: Back-end build
-          command: |
-             npm run build
+          name: Install back-end
+          command: npm install
+      - run:
+          name: Lint back-end
+          command: npm run lint
+      - run:
+          name: Build back-end
+          command: npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
