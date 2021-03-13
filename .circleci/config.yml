@@ -40,7 +40,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build-{{ .BuildNum }}]
+          keys: 
+            - frontend-build-{{ .BuildNum }}
       - run:
           name: Build front-end
           command: |
@@ -58,7 +59,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build-{{ .BuildNum }}]
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: Back-end build
           command: |
@@ -76,7 +78,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build-{{ .BuildNum }}]
+          keys: 
+            - frontend-build-{{ .BuildNum }}
       - run:
           name: Front-end test
           command: |
@@ -89,7 +92,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build-{{ .BuildNum }}]
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: Back-end test
           command: |
@@ -102,7 +106,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build-{{ .BuildNum }}]
+          keys: 
+            - frontend-build-{{ .BuildNum }}
       - run:
           name: Front-end scan
           command: |
@@ -114,7 +119,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build-{{ .BuildNum }}]
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: Back-end scan
           command: |
