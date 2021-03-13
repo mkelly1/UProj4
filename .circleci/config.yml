@@ -72,6 +72,7 @@ jobs:
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
@@ -84,6 +85,7 @@ jobs:
   test-backend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/backend
     steps:
       - checkout
       - restore_cache:
@@ -96,6 +98,7 @@ jobs:
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
@@ -107,6 +110,7 @@ jobs:
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
+    working_directory: ~/backend
     steps:
       - checkout
       - restore_cache:
