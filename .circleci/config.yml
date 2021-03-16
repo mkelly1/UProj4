@@ -31,12 +31,11 @@ commands:
             #  Add revert code here. You can find this in the Getting Started section.
               exit 1
             fi
-            
+
 jobs:
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
-    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
@@ -55,7 +54,6 @@ jobs:
   build-backend:
     docker:
       - image: circleci/node:13.8.0
-    working_directory: ~/backend
     steps:
       - checkout
       - restore_cache:
@@ -100,11 +98,10 @@ jobs:
             cd backend
             npm install
             npm run test
-            
+
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
-    working_directory: ~/frontend
     steps:
       - checkout
       - restore_cache:
@@ -119,7 +116,6 @@ jobs:
   scan-backend:
     docker:
       - image: circleci/node:13.8.0
-    working_directory: ~/backend
     steps:
       - checkout
       - restore_cache:
