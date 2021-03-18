@@ -47,6 +47,8 @@ jobs:
             cd frontend
             npm install
             npm run build
+            cd dist
+            ls
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build-{{ .BuildNum }}
@@ -76,7 +78,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: 
-            - frontend-build-{{ .BuildNum }}
+            
       - run:
           name: Front-end test
           command: |
