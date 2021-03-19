@@ -37,9 +37,10 @@ Resources:
           Value: !Sub backend-${ID}
 
 Outputs:
-  Description: Backend URL
-  Value: !Sub
-    - http://${URL}
-    - { URL: !GetAtt EC2Instance.PublicDnsName }
+  BACKENDDNS:
+    Description: Backend URL
+    Value: !Sub
+      - http://${URL}
+      - { URL: !GetAtt EC2Instance.PublicDnsName }
     Export:
       Name: Backend-SiteURL
