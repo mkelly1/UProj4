@@ -10,7 +10,7 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
+            #  aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
             exit 1
 
   revert-migrations:
@@ -127,6 +127,42 @@ jobs:
             npm install
             npm audit --audit-level=critical
 
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=backend \
+              --stack-name "backend_${CIRCLE_WORKFLOW_ID}" \
+              --parameter-overrides ID="67k9i1f1"
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=frontend \
+              --stack-name "frontend_${CIRCLE_WORKFLOW_ID}" \
+              --parameter-overrides ID="67k9i1f1"  
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instances \
+              --query 'Reservations[*].PublicIpAddress' \
+              #--filters "Name=tag:Project,Values=proj4" \
+              --output >> inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - run:
+      - destroy-infrastructure
+        when: on_fail
+
 workflows:
   default:
     jobs:
@@ -140,3 +176,5 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
