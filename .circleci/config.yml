@@ -4,7 +4,7 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+    # Add parameter here   
     steps:
       - run:
           name: Destroy environments
@@ -16,7 +16,7 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
-      # Add parameter here     
+    # Add parameter here     
     steps:
       - run:
           name: Revert migrations
@@ -24,7 +24,7 @@ commands:
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS = 1
-            if(( $SUCCESS==1 )); 
+            if(( $SUCCESS==1 ));
             then
             #  cd ~/project/backend
             #  npm install
@@ -77,7 +77,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        key: frontend-build-{{ .BuildNum }}
+          keys: 
+            - frontend-build-{{ .BuildNum }}
       - run:
           name: Front-end test
           command: |
@@ -91,7 +92,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: backend-build-{{ .BuildNum }}
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: Back-end test
           command: |
