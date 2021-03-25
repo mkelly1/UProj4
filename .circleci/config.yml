@@ -223,7 +223,6 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/
             
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}" 
-     - destroy-environment
 
   deploy-frontend:
     docker:
