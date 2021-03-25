@@ -162,9 +162,9 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --output text >> inventory.txt
       - persist_to_workspace:
-          root: .
+          root: ~/project
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - .circleci/ansible/inventory.txt
             - tmp/ansible/inventory.txt
       - destroy-environment
 
@@ -176,7 +176,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - attach_workspace:
-          at: ~
+          at: ~/project
       - run:
           name: Install dependencies
           command: |
@@ -247,9 +247,9 @@ jobs:
           command: |
             aws s3 cp ./dist s3://udapeople-67k9i1f1/ --recursive
       - persist_to_workspace:
-          root: ~
+          root: ~/project
           paths:
-            - project/.circleci/frontend/dist
+            - .circleci/frontend/dist
       - destroy-environment
 
   deploy-backend:
@@ -260,7 +260,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - attach_workspace:
-        at: ~
+        at: ~/project
       - run:
           name: Install dependencies
           command: |
