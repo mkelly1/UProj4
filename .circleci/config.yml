@@ -6,14 +6,14 @@ commands:
     parameters:
       workflow-id:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
+        default: ${CIRCLE_WORKFLOW_ID:0:12}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name prod-${CIRCLE_WORKFLOW_ID}
-            exit 1
+            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:12}
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:12}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -143,7 +143,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=proj4 \
-              --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:13}" \
+              --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:12}" \
               --parameter-overrides ID="67k9i1f1"
               --region=us-west-2
       - run:
@@ -152,7 +152,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
-              --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:13}" \
+              --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:12}" \
               --parameter-overrides ID="67k9i1f1"
       - run:
           name: Add back-end ip to ansible inventory
@@ -178,7 +178,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
+            apk add --update ansible npm nodejs
             pip install awscli 
       - run:
           name: Configure server
@@ -204,11 +204,15 @@ jobs:
       image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: Run migrations
           command: |
-            # Your code here
-            exit 1
+            cd backend
+            sudo npm install
+            sudo npm run migrations > migration-status
       - run:
           name: Send migration results to memstash
           command: |
@@ -217,6 +221,8 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/
             else
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/
+            
+            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}" 
      - destroy-environment
 
   deploy-frontend:
@@ -227,36 +233,43 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            sudo npm install
       - run:
           name: Get backend url
           command: |
             # your code here
-            export API_URL="http://${BACKEND_IP}:3030"
+            export API_URL="http://${BACKEND_DNS}:3000"
             echo "${API_URL}"
+            sudo npm build
       - run:
           name: Deploy frontend objects
           command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure      
-                    
+            aws s3 cp ./dist s3://udapeople-67k9i1f1/ --recursive
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/frontend/dist
+      - destroy-environment
+
   deploy-backend:
     docker:
       image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
+      - attach workspace:
+        at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
+            apk add --update ansible npm nodejs curl
+            pip install awscli
       - run:
           name: Deploy backend
           command: |
-            # your code here
-      # Here's where you will add some code to rollback on failure  
-
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment
 
 workflows:
   default:
