@@ -6,7 +6,7 @@ Parameters:
     Description: Unique identifier.
     Type: String
   VPCID:
-    Description:
+    Description: VPCID
     Type: String
   AZ:
     Description: AZ for EC2 instance (2b)
