@@ -143,6 +143,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=proj4 \
+              --tags name=backend \
               --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:12}" \
               --parameter-overrides ID="67k9i1f1"
               --region=us-west-2
@@ -157,15 +158,15 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws ec2 describe-instances \
-              --query 'Reservations[*].PublicIpAddress' \
+            aws --region us-west-2 \
+              ec2 describe-instances \
               --filters "Name=tag:project,Values=proj4" \
+              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text >> inventory.txt
       - persist_to_workspace:
-          root: ~/project
+          root: .
           paths:
             - .circleci/ansible/inventory.txt
-            - tmp/ansible/inventory.txt
       - destroy-environment
 
   configure-infrastructure:
@@ -176,7 +177,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - attach_workspace:
-          at: ~/project
+          at: .
       - run:
           name: Install dependencies
           command: |
@@ -260,7 +261,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - attach_workspace:
-        at: ~/project
+        at: .
       - run:
           name: Install dependencies
           command: |

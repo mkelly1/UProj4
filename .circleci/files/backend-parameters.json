@@ -2,5 +2,17 @@
     {
         "ParameterKey": "ID",
         "ParameterValue": "67k9i1f1"
+    },
+    {
+        "ParameterKey": "VPCID",
+        "ParameterValue": "vpc-19bcdf61"
+    },
+    {
+        "ParameterKey": "CIDR",
+        "ParameterValue": "172.31.0.0/16"
+    },
+    {
+        "ParameterKey": "AZ",
+        "ParameterValue": "us-west-2b"
     }
 ]
