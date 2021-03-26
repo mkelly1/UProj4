@@ -12,9 +12,6 @@ Parameters:
     Description: AZ for EC2 instance (2b)
     Type: String
 
-    `make subnet associations for route table
-    `make routes
-
 Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
