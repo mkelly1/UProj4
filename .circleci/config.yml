@@ -145,8 +145,13 @@ jobs:
               --tags project=proj4 \
               --tags name=backend \
               --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:12}" \
-              --parameter-overrides file://.circleci/files/backend-parameters.json \
-              --region=us-west-2
+              --region=us-west-2 \
+              --parameter-overrides \
+                ID="67k9i1f1" \
+                VPCID="vpc-0caf7189e77171517" \
+                CIDR="10.0.0.0/16" \
+                AZName="us-west-2b"
+              
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -154,7 +159,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
               --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:12}" \
-              --parameter-overrides file://.circleci/files/frontend-parameters.json \
+              --parameter-overrides ID="67k9i1f1" \
               --region=us-west-2
       - run:
           name: Add back-end ip to ansible inventory
