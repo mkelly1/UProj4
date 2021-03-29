@@ -5,14 +5,14 @@
     },
     {
         "ParameterKey": "VPCID",
-        "ParameterValue": "vpc-19bcdf61"
+        "ParameterValue": "vpc-0caf7189e77171517"
     },
     {
         "ParameterKey": "CIDR",
-        "ParameterValue": "172.31.0.0/16"
+        "ParameterValue": "10.0.0.0/16"
     },
     {
-        "ParameterKey": "AZ",
+        "ParameterKey": "AZName",
         "ParameterValue": "us-west-2b"
     }
 ]

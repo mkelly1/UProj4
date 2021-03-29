@@ -8,15 +8,15 @@ Parameters:
   VPCID:
     Description: VPCID
     Type: String
-  AZ:
-    Description: AZ for EC2 instance (2b)
+  AZName:
+    Description: AZ name for EC2 instance (2b)
     Type: String
 
 Resources:
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupName: !Sub UdaPeople-${ID}
+      GroupName: !Sub EC2SecGroup-${ID}
       GroupDescription: Allow port 22 and port 3030.
       SecurityGroupIngress:
         - IpProtocol: tcp
@@ -33,9 +33,8 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      SecurityGroup: 
-        - !GetAtt InstanceSecurityGroup.GroupId
-      AvailabilityZone: !Ref AZ
+      SecurityGroups: 
+        - !Ref InstanceSecurityGroup
       KeyName: udacity # If you use another key pair name, you should change this value to match.
       # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
       # Ubuntu 18 or higher works fine
@@ -47,10 +46,22 @@ Resources:
           Value: proj4
 
 Outputs:
-  BACKENDDNS:
+  BackendDNS:
     Description: Backend DNS
     Value: !Sub
       - http://${DNS}
       - { DNS: !GetAtt EC2Instance.PublicDnsName }
     Export:
       Name: Backend-DNS
+  BackendIP:
+    Description: Backend IP
+    Value: !Sub
+      - http://${IP}
+      - { IP: !GetAtt EC2Instance.PublicIp }
+    Export:
+      Name: Backend-IP
+  EC2SecGroupID:
+    Description: EC2 Security Group
+    Value: !Ref InstanceSecurityGroup
+    Export:
+      Name: EC2SecGroupIP

@@ -145,7 +145,7 @@ jobs:
               --tags project=proj4 \
               --tags name=backend \
               --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:12}" \
-              --parameter-overrides file://.circleci/files/backend-parameters.json \
+               
               --region=us-west-2
       - run:
           name: Ensure front-end infrastructure exist
