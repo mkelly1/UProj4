@@ -11,7 +11,7 @@ Parameters:
     Default: vpc-0caf7189e77171517
   EC2SubnetID:
     Description: Subnet for EC2 instance
-    Type: String
+    Type: AWS::EC2::Subnet::Id
     Default: "subnet-0c2689f69a40847fd"
 
 Resources:
@@ -36,7 +36,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-0ca5c3bd5a268e7db
-      SubnetId: EC2SubnetID
+      SubnetId: !Ref EC2SubnetID
       SecurityGroupIds: 
         - !GetAtt InstanceSecurityGroup.GroupId
       KeyName: udacity # If you use another key pair name, you should change this value to match.
