@@ -12,7 +12,7 @@ Parameters:
   EC2SubnetID:
     Description: Subnet for EC2 instance
     Type: AWS::EC2::Subnet::Id
-    Default: "subnet-0c2689f69a40847fd"
+    Default: subnet-0c2689f69a40847fd
 
 Resources:
   InstanceSecurityGroup:
