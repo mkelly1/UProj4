@@ -8,8 +8,9 @@ Parameters:
   VPCID:
     Description: VPCID
     Type: String
-  AZName:
-    Description: AZ name for EC2 instance (2b)
+    #Default: vpc-0caf7189e77171517
+  EC2SubnetID:
+    Description: Subnet for EC2 instance
     Type: String
 
 Resources:
@@ -33,12 +34,14 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
+      ImageId: ami-0ca5c3bd5a268e7db
+      SubnetId: EC2SubnetID
       SecurityGroupIds: 
         - !GetAtt InstanceSecurityGroup.GroupId
       KeyName: udacity # If you use another key pair name, you should change this value to match.
       # If this ami id is not available for you, you can find another (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/finding-an-ami.html)
       # Ubuntu 18 or higher works fine
-      ImageId: ami-0ca5c3bd5a268e7db
+
       Tags:
         - Key: name
           Value: !Sub backend-${ID}

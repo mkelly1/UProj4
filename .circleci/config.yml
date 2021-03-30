@@ -149,8 +149,7 @@ jobs:
               --parameter-overrides \
                 ID="67k9i1f1" \
                 VPCID="vpc-0caf7189e77171517" \
-                CIDR="10.0.0.0/16" \
-                AZName="us-west-2b"
+                EC2Subnet="subnet-0c2689f69a40847fd"
               
       - run:
           name: Ensure front-end infrastructure exist
