@@ -140,8 +140,8 @@ jobs:
       - run:
         name: Install tar utility
         command: |
-          sudo yum install tar
-          sudo yum update tar
+          yum install tar
+          yum update tar
       - run:
           name: Ensure back-end infrastructure exists
           command: |
