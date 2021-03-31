@@ -1,5 +1,5 @@
 ---
-- name: "update apt packages."
+- name: "update apt packages."added 
   become: yes
   apt:
     update_cache: yes
@@ -23,3 +23,17 @@
     global: yes
     production: yes
     state: present
+
+- name: Creates directory
+  file:
+    path: ~/web
+    state: directory
+
+- name: Copy index test page
+  template:
+    src: "files/index.js"
+    dest: "~/web/index.js"
+
+- name: Executing node
+  shell: |
+    pm2 start ~/web/index.js -f

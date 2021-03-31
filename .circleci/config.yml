@@ -137,6 +137,11 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
+      -run:
+        name: Install tar utility
+        command: |
+          sudo yum install tar
+          sudo yum update tar
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -150,7 +155,6 @@ jobs:
                 ID="67k9i1f1" \
                 VPCID="vpc-0caf7189e77171517" \
                 EC2Subnet="subnet-0c2689f69a40847fd"
-              
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -192,18 +196,6 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cd ~/.circleci/backend
-            echo ENVIRONMENT=production > ".env"
-            echo TYPEORM_CONNECTION=postgres >> ".env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
-            echo NODE_ENV=production >> ".env"
-            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env" 
             cd ~/.circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
