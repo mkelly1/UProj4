@@ -139,7 +139,7 @@ jobs:
       - checkout
       - run:
           name: Install tar utility
-          command: yum -y install tar
+          command: yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
