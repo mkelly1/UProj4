@@ -137,7 +137,7 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      -run:
+      - run:
         name: Install tar utility
         command: |
           sudo yum install tar
