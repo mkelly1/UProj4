@@ -139,9 +139,7 @@ jobs:
       - checkout
       - run:
         name: Install tar utility
-        command: |
-          yum install tar
-          yum update tar
+        command: yum install tar
       - run:
           name: Ensure back-end infrastructure exists
           command: |
