@@ -163,16 +163,6 @@ jobs:
               --parameter-overrides ID="67k9i1f1" \
               --region=us-west-2
 
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-
-              curl -H "Content-Type: text/plain" -H "token: b392d221-f54f-416d-a0e7-247f870c8a8c" --request PUT --data "inventory.txt" https://api.memstash.io/values/Inventory           
-
-      - persist_to_workspace:
-          root: /root
-          paths:
-            - project/.circleci/ansible/
       - destroy-environment
 
   configure-infrastructure:
@@ -188,7 +178,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --no-cache tar gzip
-            apk add --update ansible npm nodejs
+            apk add --update ansible npm nodejs curl
             pip install awscli 
       - run:
           name: Add back-end IP to ansible inventory
@@ -239,6 +229,8 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+            
+            sudo apt install curl
             cd backend
             npm install
             npm run migrations > /backend/migration-status
@@ -264,12 +256,13 @@ jobs:
           name: Install dependencies
           command: |
             sudo npm install
+            sudo yum -y install curl
       - run:
           name: Get backend url
           command: |
             BACKEND_IP = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP
-            export API_URL="http://${BACKEND_DNS}:3000"
-            echo "${API_URL}"
+            export API_IP="http://${BACKEND_IP}:3000"
+            echo "${API_IP}"
             sudo npm build
       - run:
           name: Deploy frontend objects
