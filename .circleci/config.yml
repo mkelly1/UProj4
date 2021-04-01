@@ -162,18 +162,22 @@ jobs:
               --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:12}" \
               --parameter-overrides ID="67k9i1f1" \
               --region=us-west-2
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            aws --region us-west-2 \
-              ec2 describe-instances \
+            touch inventory.txt
+            echo [web] > inventory.txt
+            aws ec2 describe-instances \
+              --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text >> inventory.txt
+
       - persist_to_workspace:
-          root: .
+          root: /root
           paths:
-            - .circleci/ansible/inventory.txt
+            - project
       - destroy-environment
 
   configure-infrastructure:
@@ -184,7 +188,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - attach_workspace:
-          at: .
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -194,7 +198,8 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cd ~/.circleci/ansible
+            cat /project/inventory.txt > ./.circleci/ansible/inventory.txt
+            cd /project/.circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment
 
@@ -209,18 +214,31 @@ jobs:
       - run:
           name: Run migrations
           command: |
+            echo ENVIRONMENT=production > "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo NODE_ENV=production >> "backend/.env"
+
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
             cd backend
-            sudo npm install
-            sudo npm run migrations > migration-status
+            npm install
+            npm run migrations > /backend/migration-status
       - run:
           name: Send migration results to memstash
           command: |
+            cd ./backend
             if grep -q "has been executed successfully" migration-status
             then
-              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/
+              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration${CIRCLE_WORKFLOW_ID:0:12}
             else
-              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/
-            
+              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration${CIRCLE_WORKFLOW_ID:0:12}
+            fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}" 
 
   deploy-frontend:
