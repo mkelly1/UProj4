@@ -24,14 +24,12 @@ commands:
           name: Revert migrations
           # Add when this will run
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
-            if(( $SUCCESS==1 ));
+            SUCCESS = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/Migration
+            if(( $SUCCESS=="success" ));
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+              npm install
+              cd ~/project/backend
+              npm run migrations:revert
             fi
 
 jobs:
@@ -240,9 +238,9 @@ jobs:
             cd ./backend
             if grep -q "has been executed successfully" migration-status
             then
-              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration${CIRCLE_WORKFLOW_ID:0:12}
+              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
             else
-              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration${CIRCLE_WORKFLOW_ID:0:12}
+              curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}"
       - destroy-environment
@@ -261,9 +259,10 @@ jobs:
           name: Get backend url
           command: |
             BACKEND_IP = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP
-            export API_IP="http://${BACKEND_IP}:3000"
-            echo "${API_IP}"
-            sudo npm build
+            $BACKEND_URL = 'http://$BACKEND_IP/latest/meta-data/public-hostname'
+            export API_URL="http://${BACKEND_URL}:3000"
+            echo "${API_URL}"
+            sudo npm run build
       - run:
           name: Deploy frontend objects
           command: |
