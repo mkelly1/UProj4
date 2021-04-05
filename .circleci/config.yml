@@ -231,7 +231,9 @@ jobs:
             sudo apt install curl
             cd backend
             npm install
+            npm update
             npm run build
+            touch /backend/migrations-status
             npm run migrations > /backend/migration-status
       - run:
           name: Send migration results to memstash
