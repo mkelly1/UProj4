@@ -17,6 +17,18 @@
       raw: test -e /usr/bin/python3 || (apt -y update && apt install -y python3)
       changed_when: false
 
+  environment:
+      ENVIRONMENT=production
+      TYPEORM_CONNECTION=postgres
+      TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts
+      TYPEORM_MIGRATIONS=./src/migrations/*.ts
+      TYPEORM_MIGRATIONS_DIR=./src/migrations
+      NODE_ENV=production
+      TYPEORM_HOST=database-1.culjb0lecnj7.us-west-2.rds.amazonaws.com
+      TYPEORM_PORT=5432
+      TYPEORM_USERNAME=postgreuser
+      TYPEORM_PASSWORD=DT7CAvJGEU8xmtaONsr6
+      TYPEORM_DATABASE=database-1
   roles:
     - configure-prometheus-node-exporter
     - configure-server1

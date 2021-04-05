@@ -5,12 +5,12 @@
     update_cache: yes
     
 - name: "upgrade packages."
-  become: yes
+  become: true
   apt:
     upgrade: yes
 
 - name: "install dependencies."
-  become: yes
+  become: true
   apt:
     name: ["nodejs", "npm"]
     state: latest
