@@ -231,6 +231,7 @@ jobs:
             sudo apt install curl
             cd backend
             npm install
+            npm update
             npm run build
             touch /backend/migration-status
             npm run migrations > /backend/migration-status
