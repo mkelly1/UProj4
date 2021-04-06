@@ -210,8 +210,8 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys: 
-          - backend-build-{{ .BuildNum }}
+          keys: 
+            - backend-build-{{ .BuildNum }}
       - run:
           name: install awscli and python
           command: |
