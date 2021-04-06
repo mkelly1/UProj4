@@ -220,18 +220,20 @@ jobs:
             sudo apt-get -qq install awscli
       - run:
           name: Run migrations
-          command: |           
+          command: |
             sudo apt install curl
-            cd backend
+            cd ~/project/backend
             npm install
             npm run build
-            npm run migrations > ~/.circleci/migration-status.txt
+            touch ~/project/backend/migration-status.txt
+            npm run migrations > ~/project/backend/migration-status.txt
             echo "******migration status*****"
-            cat migration-status.txt
+            cat ~/project/backend/migration-status.txt
       - run:
           name: Send migration results to memstash
           command: |
-            cd .~/.circleci
+            cd ~/project/backend
+            sudo cat ~/project/backend/migrations-status.txt
             if grep -q "has been executed successfully" migration-status.txt
             then
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
