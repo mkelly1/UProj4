@@ -158,7 +158,6 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
               --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:12}" \
-              --parameter-overrides ID="67k9i1f1" \
               --region=us-west-2
 
       - destroy-environment
