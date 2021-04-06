@@ -185,9 +185,10 @@ jobs:
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
-              --output text | tee inventory.txt >> BACKEND_IP
+              --output text | tee BACKEND_IP >> inventory.txt
 
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "BACKEND_IP" https://api.memstash.io/values/backendIP
+            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "inventory.txt" https://api.memstash.io/values/Inventory
             cd ~/project
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -224,14 +225,13 @@ jobs:
             cd backend
             npm install
             npm run build
-            sudo touch ~/project/migration-status.txt
-            npm run migrations > ~/project/migration-status.txt
+            npm run migrations > ~/.circleci/migration-status.txt
             echo "******migration status*****"
             cat migration-status.txt
       - run:
           name: Send migration results to memstash
           command: |
-            cd .~/project
+            cd .~/.circleci
             if grep -q "has been executed successfully" migration-status.txt
             then
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
@@ -299,6 +299,7 @@ jobs:
           name: Deploy backend
           command: |
             cd ~/project/ansible
+            inventory.txt = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/Inventory
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
 
