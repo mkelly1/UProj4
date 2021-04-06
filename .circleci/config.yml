@@ -6,14 +6,14 @@ commands:
     parameters:
       workflow-id:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:12}
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:12}
-            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:12}
+            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -145,7 +145,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=proj4 \
               --tags name=backend \
-              --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:12}" \
+              --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --region=us-west-2 \
               --parameter-overrides \
                 ID="67k9i1f1" \
@@ -157,7 +157,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
-              --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:12}" \
+              --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --region=us-west-2
 
       - destroy-environment
@@ -238,7 +238,7 @@ jobs:
             else
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration
             fi
-            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}"
+            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy-environment
       - revert-migrations
 
@@ -263,7 +263,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:12}/ --recursive
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
       - persist_to_workspace:
           root: ~/project
           paths:
