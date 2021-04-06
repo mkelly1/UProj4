@@ -213,11 +213,11 @@ jobs:
         keys: 
           - backend-build-{{ .BuildNum }}
       - run:
-        name: install awscli and python
-        command: |
-          sudo apt-get -y -qq update
-          sudo apt-get -y -qq install python3
-          sudo apt-get -qq install awscli
+          name: install awscli and python
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get -y -qq install python3
+            sudo apt-get -qq install awscli
       - run:
           name: Run migrations
           command: |           
