@@ -224,14 +224,14 @@ jobs:
             cd backend
             npm install
             npm run build
-            sudo touch ~/project/backend/migration-status.txt
-            npm run migrations > ~/project/backend/migration-status.txt
+            sudo touch ~/project/migration-status.txt
+            npm run migrations > ~/project/migration-status.txt
             echo "******migration status*****"
             cat migration-status.txt
       - run:
           name: Send migration results to memstash
           command: |
-            cd .~/project/backend
+            cd .~/project
             if grep -q "has been executed successfully" migration-status.txt
             then
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
