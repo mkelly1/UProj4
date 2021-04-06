@@ -25,7 +25,7 @@ commands:
           # Add when this will run
           command: |
             SUCCESS = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/Migration
-            if(( $SUCCESS=="success" ));
+            if(( $SUCCESS=="fail" ));
             then
               npm install
               cd ~/project/backend
@@ -189,7 +189,7 @@ jobs:
               --output text | tee inventory.txt >> BACKEND_IP
 
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "BACKEND_IP" https://api.memstash.io/values/backendIP
-
+            cd ~/project
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
             echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
@@ -209,33 +209,30 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+        keys: 
+          - backend-build-{{ .BuildNum }}
+      - run:
+        name: install awscli and python
+        command: |
+          sudo apt-get -y -qq update
+          sudo apt-get -y -qq install python3
+          sudo apt-get -qq install awscli
       - run:
           name: Run migrations
-          command: |
-            echo ENVIRONMENT=production > "backend/.env"
-            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-            echo NODE_ENV=production >> "backend/.env"
-
-            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-            
+          command: |           
             sudo apt install curl
             cd backend
             npm install
-            npm update
             npm run build
             touch /backend/migration-status
             npm run migrations > /backend/migration-status
+            echo "******migration status*****"
+            cat migration-status
       - run:
           name: Send migration results to memstash
           command: |
-            cd ./backend
+            cd .~/project/backend
             if grep -q "has been executed successfully" migration-status
             then
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
@@ -244,6 +241,7 @@ jobs:
             fi
             echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:12}"
       - destroy-environment
+      - revert-migrations
 
   deploy-frontend:
     docker:
@@ -261,12 +259,12 @@ jobs:
             BACKEND_IP = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP
             $BACKEND_URL = 'http://$BACKEND_IP/latest/meta-data/public-hostname'
             export API_URL="http://${BACKEND_URL}:3000"
-            echo "${API_URL}"
+            echo "***${API_URL}***"
             sudo npm run build
       - run:
           name: Deploy frontend objects
           command: |
-            aws s3 cp ./dist s3://udapeople-67k9i1f1/ --recursive
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:12}/ --recursive
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -285,10 +283,23 @@ jobs:
           command: |
             apk add --update ansible npm nodejs curl
             pip install awscli
+            cd ~/project/backend
+            echo ENVIRONMENT=production > ".env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> ".env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> ".env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> ".env"
+            echo NODE_ENV=production >> ".env"
+
+            echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
       - run:
           name: Deploy backend
           command: |
-            cd .circleci/ansible
+            cd ~/project/ansible
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
 
