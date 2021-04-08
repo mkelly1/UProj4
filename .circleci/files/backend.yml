@@ -60,13 +60,20 @@ Outputs:
       - { DNS: !GetAtt EC2Instance.PublicDnsName }
     Export:
       Name: Backend-DNS
-  BackendIP:
+  BackendPubIP:
     Description: Backend IP
     Value: !Sub
       - http://${IP}
       - { IP: !GetAtt EC2Instance.PublicIp }
     Export:
-      Name: Backend-IP
+      Name: BackendPublic-IP
+  BackendPrivIP:
+    Description: BackendPriv IP
+    Value: !Sub
+      - http://${PvIP}
+      - { PvIP: !GetAtt EC2Instance.PrivateIp }
+    Export:
+      Name: BackendPrivate-IP
   EC2SecGroupID:
     Description: EC2 Security Group
     Value: !Ref InstanceSecurityGroup
