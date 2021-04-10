@@ -226,7 +226,7 @@ jobs:
             npm install
             npm run build
             touch ~/project/backend/migration-status.txt
-            npm run migrations > ~/project/backend/migration-status.txt
+            npm run migrations >> ~/project/backend/migration-status.txt
             echo "******migration status*****"
             cat migration-status.txt
       - run:
