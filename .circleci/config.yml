@@ -20,14 +20,29 @@ commands:
     parameters:
     # Add parameter here     
     steps:
+          docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: 
+            - backend-build-{{ .BuildNum }}
+      - run:
+          name: install awscli and python
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get -y -qq install python3
+            sudo apt-get -qq install awscli
+            sudo apt install curl
       - run:
           name: Revert migrations
-          # Add when this will run
           command: |
-            SUCCESS = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/Migration
+            cd ~/project/backend
+            npm install
+            npm run build
+            SUCCESS=curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/Migration
             if(( $SUCCESS=="fail" ));
-            then
-              npm install
+              then
               cd ~/project/backend
               npm run migrations:revert
             fi
