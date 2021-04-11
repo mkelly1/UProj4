@@ -24,7 +24,7 @@ commands:
           name: Revert migrations
           command: |
             sudo apt-get install curl
-            SUCCESS=(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Migration")
+            SUCCESS=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Migration")
             if(( $SUCCESS=="fail" ));
             then
               cd ~/project/backend
@@ -259,8 +259,8 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP = curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP
-            $BACKEND_URL = 'http://$BACKEND_IP/latest/meta-data/public-hostname'
+            BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP)
+            $BACKEND_URL='http://$BACKEND_IP/latest/meta-data/public-hostname'
             export API_URL="http://${BACKEND_URL}:3000"
             echo "***${API_URL}***"
             npm run build
