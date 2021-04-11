@@ -268,7 +268,7 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
-            aws s3 cp ./dist s3://newudapeople-67k9i1f1/ --recursive
+            aws s3 cp ~/project/frontend/dist s3://newudapeople-67k9i1f1/ --recursive
       - persist_to_workspace:
           root: ~/project
           paths:
