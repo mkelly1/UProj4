@@ -188,8 +188,8 @@ jobs:
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text | tee BACKEND_IP >> inventory.txt
 
-            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "BACKEND_IP" https://api.memstash.io/values/backendIP
-            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "inventory.txt" https://api.memstash.io/values/Inventory
+            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data BACKEND_IP https://api.memstash.io/values/backendIP
+            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data inventory.txt https://api.memstash.io/values/Inventory
             cd ~/project
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -248,14 +248,15 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
           name: Install dependencies
           command: |
+            sudo apt update
+            sudo apt install curl
             npm install
-            yum -y install curl
       - run:
           name: Get backend url
           command: |
@@ -293,7 +294,7 @@ jobs:
           name: Deploy backend
           command: |
             cd .circleci/ansible
-            inventory.txt=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Inventory")
+            inventory=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Inventory")
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
@@ -325,8 +326,8 @@ jobs:
       - run:
           name: Backend smoke test
           command: |
-            BACKEND_IP=(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/backendIP")
-            if $(curl "http://${BACKEND_IP}:3030/api/status" -I | grep '200');
+            BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/backendIP")
+            if $(curl -I "http://${BACKEND_IP}:3030/api/status"| grep '200 OK');
             then
             echo "Success backend smoke"
             return 0
