@@ -187,7 +187,7 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text > BACKEND_IP
-            BACKEND_IP >> inventory.txt
+            $BACKEND_IP >> inventory.txt
 
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data $BACKEND_IP https://api.memstash.io/values/backendIP
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data $inventory.txt https://api.memstash.io/values/Inventory
@@ -305,7 +305,7 @@ jobs:
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text > BACKEND_IP
             cd .circleci/ansible
-            BACKEND_IP >> inventory.txt
+            $BACKEND_IP >> inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
