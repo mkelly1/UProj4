@@ -259,7 +259,6 @@ jobs:
             sudo apt -y install curl
             sudo apt-get -y -qq install python3
             sudo apt-get -qq install awscli
-            npm install
       - run:
           name: Get backend url
           command: |
@@ -272,6 +271,8 @@ jobs:
             export API_URL="http://${BACKEND_URL}:3030"
             echo "***${API_URL}***"
             cd ~/project/frontend
+            echo pwd
+            npm install
             npm run build
       - run:
           name: Deploy frontend objects
