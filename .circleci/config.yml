@@ -24,14 +24,12 @@ commands:
       - run:
           name: Revert migrations
           command: |
-            apt-get install curl
             curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Migration" > SUCCESS
             if(( $SUCCESS=="fail" ));
             then
               cd ~/project/backend
               cat .env
               npm install
-              npm run build
               npm run migrations:revert
             fi
 
