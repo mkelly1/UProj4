@@ -12,8 +12,7 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            if aws s3 ls s3://newudapeople-67k9i1f1 | grep -q "bucket does not exist";
-            aws s3 rm s3://newudapeople-67k9i1f1 --recursive
+            aws s3 rm s3://newudapeople-67k9i1f1 --recursive 2> /dev/null
             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
