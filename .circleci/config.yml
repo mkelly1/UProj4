@@ -28,8 +28,8 @@ commands:
             if(( $SUCCESS=="fail" ));
             then
               cd ~/project/backend
-              cat .env
               npm install
+              cat .env
               npm run migrations:revert
             fi
 
