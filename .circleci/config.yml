@@ -24,7 +24,7 @@ commands:
           name: Revert migrations
           command: |
             sudo apt-get install curl
-            SUCCESS=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Migration")
+            curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Migration" > SUCCESS
             if(( $SUCCESS=="fail" ));
             then
               cd ~/project/backend
@@ -279,7 +279,6 @@ jobs:
           paths:
             - .circleci/frontend/dist
       - destroy-environment
-      - revert-migrations
 
   deploy-backend:
     docker:
@@ -308,7 +307,6 @@ jobs:
             $BACKEND_IP >> inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
-      - revert-migrations
 
   smoke-test:
     docker:
