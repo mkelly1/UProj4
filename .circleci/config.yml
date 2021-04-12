@@ -186,10 +186,11 @@ jobs:
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
-              --output text | tee BACKEND_IP >> inventory.txt
+              --output text > BACKEND_IP
+            BACKEND_IP >> inventory.txt
 
-            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data BACKEND_IP https://api.memstash.io/values/backendIP
-            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data inventory.txt https://api.memstash.io/values/Inventory
+            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data $BACKEND_IP https://api.memstash.io/values/backendIP
+            curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data $inventory.txt https://api.memstash.io/values/Inventory
             cd ~/project
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"
             echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
@@ -261,8 +262,8 @@ jobs:
           name: Get backend url
           command: |
             BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP)
-            $BACKEND_URL='http://$BACKEND_IP/latest/meta-data/public-hostname'
-            export API_URL="http://${BACKEND_URL}:3000"
+            BACKEND_URL=http://$BACKEND_IP/latest/meta-data/public-hostname
+            export API_URL="http://${BACKEND_URL}:3030"
             echo "***${API_URL}***"
             npm run build
       - run:
@@ -327,7 +328,7 @@ jobs:
           name: Backend smoke test
           command: |
             BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/backendIP")
-            if $(curl -I "http://${BACKEND_IP}:3030/api/status"| grep '200 OK');
+            if $(curl -I http://${BACKEND_IP}:3030/api/status| grep '200 OK');
             then
             echo "Success backend smoke"
             return 0
