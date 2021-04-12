@@ -261,7 +261,11 @@ jobs:
       - run:
           name: Get backend url
           command: |
-            BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET https://api.memstash.io/values/backendIP)
+            aws ec2 describe-instances \
+              --region us-west-2 \
+              --filters "Name=tag:project,Values=proj4" \
+              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --output text > BACKEND_IP
             BACKEND_URL=http://$BACKEND_IP/latest/meta-data/public-hostname
             export API_URL="http://${BACKEND_URL}:3030"
             echo "***${API_URL}***"
@@ -294,8 +298,14 @@ jobs:
       - run:
           name: Deploy backend
           command: |
+            echo [web] > inventory.txt
+            aws ec2 describe-instances \
+              --region us-west-2 \
+              --filters "Name=tag:project,Values=proj4" \
+              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --output text > BACKEND_IP
             cd .circleci/ansible
-            inventory=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/Inventory")
+            BACKEND_IP >> inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
@@ -316,7 +326,7 @@ jobs:
           name: Frontend smoke test
           command: |
             URL=http://newudapeople-67k9i1f1.s3-website-us-west-2.amazonaws.com
-            if curl -s ${URL} | grep "Welcome"
+            if $(curl -I ${URL} | grep "200 OK");
             then
               echo "Success Frontend smoke"
               return 0
@@ -327,14 +337,18 @@ jobs:
       - run:
           name: Backend smoke test
           command: |
-            BACKEND_IP=$(curl -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request GET "https://api.memstash.io/values/backendIP")
-            if $(curl -I http://${BACKEND_IP}:3030/api/status| grep '200 OK');
+            aws ec2 describe-instances \
+              --region us-west-2 \
+              --filters "Name=tag:project,Values=proj4" \
+              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --output text > BACKEND_IP
+            if $(curl -I http://${BACKEND_IP}:3030/api/status| grep "200 OK");
             then
-            echo "Success backend smoke"
-            return 0
+              echo "Success backend smoke"
+              return 0
             else
-            echo "Fail backend smoke"
-            return 1
+              echo "Fail backend smoke"
+              return 1
       - destroy-environment
       - revert-migrations
 
