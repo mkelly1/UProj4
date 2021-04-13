@@ -10,8 +10,8 @@ Parameters:
 Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub "newudapeople-${ID}"
+    Properties: 
+      BucketName: !Sub "udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -35,3 +35,8 @@ Outputs:
     Description: URL for website hosted on S3
     Export:
       Name: WebsiteS3URL
+  WorkflowID:
+    Value: !Sub ${CIRCLE_WORKFLOW_ID:0:7}
+    Description: WorkflowID
+    Export:
+      Name: WorkflowID
