@@ -22,7 +22,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3.amazonaws.com"
+          - DomainName: !Sub "udapeople-${CIRCLE_WORKFLOW_ID}.s3.amazonaws.com"
             Id: webpage
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
@@ -36,13 +36,13 @@ Resources:
 
 Outputs:
   CloudFrontURL:
-    Value: !Sub "udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3.amazonaws.com"
+    Value: !Sub "udapeople-${CIRCLE_WORKFLOW_ID}.s3.amazonaws.com"
     Description: URL for website hosted on S3
     Export:
       Name: CloudFrontS3URL
 
   WorkflowID:
-    Value: !Sub ${CIRCLE_WORKFLOW_ID:0:7}
+    Value: !Sub ${CIRCLE_WORKFLOW_ID}
     Description: WorkflowID
     Export:
       Name: WorkflowID

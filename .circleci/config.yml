@@ -6,15 +6,15 @@ commands:
     parameters:
       workflow-id:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
+        default: ${CIRCLE_WORKFLOW_ID}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive 2> /dev/null
-            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive 2> /dev/null
+            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID}
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -146,7 +146,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=proj4 \
               --tags name=backend \
-              --stack-name "backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --stack-name "backend-${CIRCLE_WORKFLOW_ID}" \
               --region=us-west-2 \
               --parameter-overrides \
                 ID="67k9i1f1" \
@@ -158,7 +158,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
-              --stack-name "frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --stack-name "frontend-${CIRCLE_WORKFLOW_ID}" \
               --region=us-west-2
       - destroy-environment
 
@@ -242,7 +242,7 @@ jobs:
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration
               echo "**migration fail**"
             fi
-            echo "WorkflowID=${CIRCLE_WORKFLOW_ID:0:7}"
+            echo "WorkflowID=${CIRCLE_WORKFLOW_ID}"
       - destroy-environment
       - revert-migrations
 
@@ -370,7 +370,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name udapeople-cloudfront \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
               --tags project=udapeople
       # Here's where you will add some code to rollback on failure
       - destroy-environment
