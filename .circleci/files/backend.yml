@@ -4,7 +4,7 @@ Description: >
 Parameters:
   ID:
     Description: Unique identifier.
-    Type: Number
+    Type: String
   VPCID:
     Description: VPCID
     Type: String
@@ -78,7 +78,7 @@ Outputs:
     Export:
       Name: EC2SecGroupIP
   WorkflowID:
-    Value: !Sub ${CIRCLE_WORKFLOW_ID:0:7}
+    Value: !Sub ${ID}
     Description: WorkflowID
     Export:
       Name: Backend-WorkflowID
