@@ -11,7 +11,7 @@ Resources:
   WebsiteBucket:
     Type: AWS::S3::Bucket
     Properties: 
-      BucketName: !Sub "udapeople-${CIRCLE_WORKFLOW_ID:0:7}"
+      BucketName: !Sub udapeople-${CIRCLE_WORKFLOW_ID:0:7}
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -20,7 +20,7 @@ Resources:
   WebsiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref 'WebsiteBucket'
+      Bucket: !Ref WebsiteBucket
       PolicyDocument:
         Statement:
         - Sid: PublicReadForGetBucketObjects
