@@ -146,7 +146,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=proj4 \
               --tags name=backend \
-              --stack-name "backend-${CIRCLE_WORKFLOW_ID}" \
+              --stack-name backend-${CIRCLE_WORKFLOW_ID} \
               --region=us-west-2 \
               --parameter-overrides \
                 ID="67k9i1f1" \
@@ -158,7 +158,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=proj4 \
-              --stack-name "frontend-${CIRCLE_WORKFLOW_ID}" \
+              --stack-name frontend-${CIRCLE_WORKFLOW_ID} \
               --region=us-west-2
       - destroy-environment
 
@@ -370,7 +370,7 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name udapeople-cloudfront \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID}" \
+              --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID} \
               --tags project=udapeople
       # Here's where you will add some code to rollback on failure
       - destroy-environment
