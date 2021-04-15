@@ -35,7 +35,7 @@ Outputs:
     Export:
       Name: WebsiteS3URL
   WorkflowID:
-    Value: !Sub ${CIRCLE_WORKFLOW_ID:0:7}
+    Value: !Sub ${ID}
     Description: WorkflowID
     Export:
       Name: WorkflowID

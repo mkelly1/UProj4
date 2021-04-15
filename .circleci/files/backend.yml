@@ -77,7 +77,7 @@ Outputs:
     Value: !Ref InstanceSecurityGroup
     Export:
       Name: EC2SecGroupIP
-  WorkflowID:
+  BKWorkflowID:
     Value: !Sub ${ID}
     Description: WorkflowID
     Export:
