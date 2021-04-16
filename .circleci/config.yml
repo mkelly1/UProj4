@@ -231,15 +231,14 @@ jobs:
             npm run build
             npm run migrations > ~/project/backend/migration-status.txt
             echo "******migration status*****"
-            echo migration-status.txt
+            cat ~/project/backend/migration-status.txt
       - run:
           name: Send migration results to memstash
           command: |
             cd ~/project/backend
-            if grep -q "has been executed successfully" ~/project/backend/migration-status.txt
+            if grep -q "Item has been created" ~/project/backend/migration-status.txt
             then
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "success" https://api.memstash.io/values/Migration
-              echo "**migration success**"
             else
               curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "fail" https://api.memstash.io/values/Migration
               echo "**migration fail**"
@@ -284,7 +283,6 @@ jobs:
             cd ~/project/frontend/dist
             gzip * -r -k
             aws s3 cp ~/project/frontend/dist/*.gz s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
-            rm ~/project/frontend/dist/*.gz
       - destroy-environment
       - revert-migrations
 
@@ -334,12 +332,13 @@ jobs:
           name: Frontend smoke test
           command: |
             URL=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com
-            if $(curl -I ${URL} | grep "200 OK");
+            if $(curl -I ${URL} | grep -iF "200 OK");
             then
               echo "Success Frontend smoke"
               return 0
             else
               echo "Fail Frontend smoke"
+              echo curl -I ${URL}
               return 1
             fi
       - run:
@@ -350,12 +349,13 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text > BACKEND_IP
-            if $(curl -I http://${BACKEND_IP}:3030/api/status| grep "200 OK");
+            if $(curl -I http://${BACKEND_IP}:3030 | grep "200 OK");
             then
               echo "Success backend smoke"
               return 0
             else
               echo "Fail backend smoke"
+              echo curl -I http://${BACKEND_IP}:3030
               return 1
       - destroy-environment
       - revert-migrations
@@ -438,7 +438,7 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-#      - cloudfront-update:
-#          requires: [smoke-test]
+      - cloudfront-update:
+          requires: [smoke-test]
 #      - cleanup:
 #          requires: [cloudfront-update]
