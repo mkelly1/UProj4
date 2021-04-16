@@ -15,6 +15,11 @@ Parameters:
     Default: subnet-0c2689f69a40847fd
 
 Resources:
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [ec2_roll_for_s3]
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -41,6 +46,7 @@ Resources:
       InstanceType: t2.micro
       ImageId: ami-0ca5c3bd5a268e7db
       SubnetId: !Ref EC2SubnetID
+      IAMInstanceProfile: !Ref InstanceProfile
       SecurityGroupIds: 
         - !GetAtt InstanceSecurityGroup.GroupId
       KeyName: udacity # If you use another key pair name, you should change this value to match.

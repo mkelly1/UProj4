@@ -253,11 +253,13 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - add_ssh_keys:
+          fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - run:
           name: Install dependencies
           command: |
             sudo apt-get -y update
-            sudo apt -y install curl
+            sudo apt -y install curl tar gzip
             sudo apt-get -y -qq install python3
             sudo apt-get -qq install awscli
       - run:
@@ -279,7 +281,10 @@ jobs:
           name: Deploy frontend objects
           no_output_timeout: 10m
           command: |
-            aws s3 cp ~/project/frontend/dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
+            cd ~/roject/frontend/dist
+            gzip * -r -k
+            aws ec2 cp ~/project/frontend/dist/*.gz s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
+            rm ~/project/frontend/dist/*.gz
       - destroy-environment
       - revert-migrations
 
