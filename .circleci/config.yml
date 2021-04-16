@@ -283,8 +283,8 @@ jobs:
             cd ~/project/frontend/dist
             gzip * -r -k
             aws s3 cp ./*.gz s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
-      - destroy-environment
-      - revert-migrations
+
+
 
   deploy-backend:
     docker:
@@ -313,8 +313,8 @@ jobs:
             cd .circleci/ansible
             $BACKEND_IP >> inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment
-      - revert-migrations 
+
+
 
   smoke-test:
     docker:
@@ -357,8 +357,8 @@ jobs:
               echo "Fail backend smoke"
               echo curl -I http://${BACKEND_IP}:3030
               return 1
-      - destroy-environment
-      - revert-migrations
+
+
 
   cloudfront-update:
     docker:
@@ -380,7 +380,7 @@ jobs:
               --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
               --tags project=udapeople
       # Here's where you will add some code to rollback on failure
-      - destroy-environment
+
 
   cleanup:
     docker:
