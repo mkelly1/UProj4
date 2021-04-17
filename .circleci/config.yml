@@ -280,9 +280,8 @@ jobs:
           name: Deploy frontend objects
           no_output_timeout: 10m
           command: |
-            cd ~/project/frontend/dist
-            gzip * -r -k
-            aws s3 cp ./*.gz s3://udapeople67k9i1f1/ --recursive
+            cd ~/project/frontend/
+            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environment
       - revert-migrations
 
