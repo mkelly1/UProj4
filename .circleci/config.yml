@@ -282,7 +282,7 @@ jobs:
           command: |
             cd ~/project/frontend/
             gzip -r ./dist/*
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 cp dist s3://udapeople67k9i1f1 --recursive
       - destroy-environment
       - revert-migrations
 
