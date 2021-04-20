@@ -349,7 +349,7 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text > BACKEND_IP
-              curl -I http://${BACKEND_IP}:3030 > testback
+              curl -I http://$BACKEND_IP:3030 > testback
             if $(grep -qi "200 OK" testback);
             then
               echo "Success backend smoke"
