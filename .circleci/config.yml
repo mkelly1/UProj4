@@ -277,6 +277,7 @@ jobs:
             npm install
             npm run build
       - aws-s3/copy:
+          aws-region: ${AWS_DEFAULT_REGION}
           arguments: '--recursive'
           from: ~/project/frontend/dist/*
           to: 's3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}'
