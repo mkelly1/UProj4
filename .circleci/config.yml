@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@2.0.0
 
 commands:
   destroy-environment:
@@ -252,8 +254,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
       - run:
           name: Install dependencies
           command: |
@@ -276,12 +276,10 @@ jobs:
             echo pwd
             npm install
             npm run build
-      - run:
-          name: Deploy frontend objects
-          no_output_timeout: 10m
-          command: |
-            cd ~/project/frontend/
-            aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - aws-s3/copy:
+          arguments: '--recursive'
+          from: ~/project/frontend/dist/*
+          to: 's3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}'
       - destroy-environment
       - revert-migrations
 
