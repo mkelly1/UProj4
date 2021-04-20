@@ -331,14 +331,14 @@ jobs:
       - run:
           name: Frontend smoke test
           command: |
-            curl -I http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com/index.html > URL
-            if $(curl -I ${URL} | grep -iF "200 OK");
+            curl -I http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-west-2.amazonaws.com/index.html > testfront
+            if (grep -qi "200 OK" testfront);
             then
               echo "Success Frontend smoke"
               return 0
             else
               echo "Fail Frontend smoke"
-              echo $URL
+              cat testfront
               return 1
             fi
       - run:
@@ -349,17 +349,17 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
               --output text > BACKEND_IP
-            if $(curl -I http://${BACKEND_IP}:3030 | grep "200 OK");
+              curl -I http://${BACKEND_IP}:3030 > testback
+            if $(grep -qi "200 OK" testback);
             then
               echo "Success backend smoke"
               return 0
             else
               echo "Fail backend smoke"
-              echo curl -I http://${BACKEND_IP}:3030
+              cat testback
               return 1
       - destroy-environment
       - revert-migrations
-
 
   cloudfront-update:
     docker:
