@@ -331,14 +331,14 @@ jobs:
       - run:
           name: Frontend smoke test
           command: |
-            URL=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com/index.html
+            curl -I http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com/index.html > URL
             if $(curl -I ${URL} | grep -iF "200 OK");
             then
               echo "Success Frontend smoke"
               return 0
             else
               echo "Fail Frontend smoke"
-              echo curl -I ${URL}
+              echo $URL
               return 1
             fi
       - run:
