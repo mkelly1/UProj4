@@ -267,15 +267,16 @@ jobs:
             aws ec2 describe-instances \
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
-              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
-              --output text > BACKEND_IP
-            BACKEND_URL=http://$BACKEND_IP/latest/meta-data/public-hostname
-            export API_URL="http://${BACKEND_URL}:3030"
+              --query 'Reservations[*].Instances[*].[PublicDnsName]' \
+              --output text > BACKEND_DNS
+            cat $BACKEND_DNS
+            export API_URL="http://${BACKEND_DNS}:3030"
             echo "***${API_URL}***"
             cd ~/project/frontend
-            echo pwd
+            pwd
             npm install
             npm run build
+            cat ./dist/index.html
       - aws-s3/copy:
           aws-region: AWS_DEFAULT_REGION
           arguments: '--recursive'
