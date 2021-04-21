@@ -188,7 +188,7 @@ jobs:
             aws ec2 describe-instances \
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
-              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --query 'Reservations[*].Instaces[*].PublicIpAddress' \
               --output text > BACKEND_IP
             $BACKEND_IP >> inventory.txt
 
@@ -307,7 +307,7 @@ jobs:
             aws ec2 describe-instances \
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
-              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --query 'Reservations[*].Instaces[*].PublicIpAddress' \
               --output text > BACKEND_IP
             cd .circleci/ansible
             $BACKEND_IP >> inventory.txt
@@ -347,9 +347,9 @@ jobs:
             aws ec2 describe-instances \
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
-              --query 'Reservations[*].Instaces[*].[PublicIpAddress]' \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text > BACKEND_IP
-              curl -I http://$BACKEND_IP:3030 > testback
+              curl -I https://$BACKEND_IP:3030 > testback
             if $(grep -qi "200 OK" testback);
             then
               echo "Success backend smoke"
