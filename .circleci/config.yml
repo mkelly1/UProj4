@@ -267,7 +267,7 @@ jobs:
             aws ec2 describe-instances \
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
-              --query 'Reservations[*].Instances[*].[PublicDnsName]' \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
               --output text > BACKEND_DNS
             cat $BACKEND_DNS
             export API_URL="http://${BACKEND_DNS}:3030"
