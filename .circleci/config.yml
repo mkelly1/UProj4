@@ -172,7 +172,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
+          fingerprints: ["91:0d:9a:b9:4c:da:b6:f8:dc:2a:84:b2:34:f2:be:ef"]
       - attach_workspace:
           at: ~/
       - run:
@@ -189,8 +189,7 @@ jobs:
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].PublicIpAddress' \
-              --output text > BACKEND_IP
-            $BACKEND_IP >> inventory.txt
+              --output text >> inventory.txt
 
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "$BACKEND_IP" https://api.memstash.io/values/backendIP
             curl -H "Content-Type: text/plain" -H "token: a69d49ff-fa6e-4f73-86ad-ae03427eb4eb" --request PUT --data "$inventory.txt" https://api.memstash.io/values/Inventory
@@ -269,7 +268,7 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instances[*].PublicDnsName' \
               --output text > BACKEND_DNS
-            cat $BACKEND_DNS
+            cat BACKEND_DNS
             export API_URL="http://${BACKEND_DNS}:3030"
             echo "***${API_URL}***"
             cd ~/project/frontend
@@ -291,7 +290,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["ee:90:b8:ab:8a:57:f1:36:9a:ea:20:5c:8d:ae:b6:e7"]
+          fingerprints: ["91:0d:9a:b9:4c:da:b6:f8:dc:2a:84:b2:34:f2:be:ef"]
       - attach_workspace:
           at: ~/
       - run:
@@ -308,13 +307,11 @@ jobs:
               --region us-west-2 \
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instaces[*].PublicIpAddress' \
-              --output text > BACKEND_IP
+              --output text >> inventory.txt
             cd .circleci/ansible
-            $BACKEND_IP >> inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment
       - revert-migrations
-
 
   smoke-test:
     docker:
@@ -332,13 +329,13 @@ jobs:
           name: Frontend smoke test
           command: |
             curl -I http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-west-2.amazonaws.com/index.html > testfront
-            if (grep -qi "200 OK" testfront);
+            cat testfront
+            if (grep -qi "200 OK" $testfront);
             then
               echo "Success Frontend smoke"
               return 0
             else
               echo "Fail Frontend smoke"
-              cat testfront
               return 1
             fi
       - run:
@@ -349,7 +346,8 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text > BACKEND_IP
-              curl -I https://$BACKEND_IP:3030 > testback
+            curl -I https://$BACKEND_IP:3030 > testback
+            cat testback
             if $(grep -qi "200 OK" testback);
             then
               echo "Success backend smoke"
