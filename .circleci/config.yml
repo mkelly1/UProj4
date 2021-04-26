@@ -328,9 +328,9 @@ jobs:
       - run:
           name: Frontend smoke test
           command: |
-            curl -I http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-west-2.amazonaws.com/index.html > testfront
-            cat testfront
-            if (grep -qi "200 OK" $testfront);
+            testfront=$(curl -I 'http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-west-2.amazonaws.com/index.html' 2>/dev/null)
+            cat $testfront
+            if $(grep -qi "200 OK" $testfront);
             then
               echo "Success Frontend smoke"
               return 0
@@ -346,10 +346,10 @@ jobs:
               --filters "Name=tag:project,Values=proj4" \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text > BACKEND_IP
-            curl -I https://$BACKEND_IP:3030 > testback
+            testback=$(curl -I 'https://$BACKEND_IP:3030' 2>/dev/null)
             cat BACKEND_IP
-            cat testback
-            if $(grep -qi "200 OK" testback);
+            cat $testback
+            if $(grep -qi "200 OK" $testback);
             then
               echo "Success backend smoke"
               return 0
