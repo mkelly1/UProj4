@@ -347,6 +347,7 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text > BACKEND_IP
             curl -I https://$BACKEND_IP:3030 > testback
+            cat BACKEND_IP
             cat testback
             if $(grep -qi "200 OK" testback);
             then
